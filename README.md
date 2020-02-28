@@ -1,8 +1,13 @@
 # 재능 마켓 사이트 
 
-메인화면
+### 1 . 메인화면
+
+![메인](https://user-images.githubusercontent.com/57142305/75537903-20f9ff80-5a5b-11ea-8b96-170b112e302f.jpg)
+
+
+### 2 . 메인화면 웹 구조 
 <div>
-  <img width="1000" src="https://user-images.githubusercontent.com/57142305/75537903-20f9ff80-5a5b-11ea-8b96-170b112e302f.jpg"></img>
+  <img width="1000" src="https://user-images.githubusercontent.com/57142305/75539679-ffe6de00-5a5d-11ea-88f5-61ff162103d1.png"></img>
 </div>
 
 
