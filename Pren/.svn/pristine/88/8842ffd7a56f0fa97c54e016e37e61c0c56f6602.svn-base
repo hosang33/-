@@ -1,0 +1,312 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap      
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="saleitems">
+
+	<!-- 상품 등록 기능 -->
+	<insert id="insertSaleItem" parameterClass="SaleItem">
+		insert into SALE_ITEM_TABLES
+		(ITEM_NO, USER_NO, SUBCATE_NO, ITEM_TITLE, ITEM_CONTENTS, ITEM_PRICE, ITEM_LIKES, ITEM_STAR, ITEM_STATE,
+		 ITEM_LOGO_IMG_NAME, ITEM_SOLO, ITEM_UPLOAD_DATE, ITEM_CONTENTS_GUIDE, ITEM_CONTENTS_REFUND)
+		values
+		(sale_item_table_seq.nextval, #user.no#, #subCategoryNo#, #title#, #content#, #price#, #likes#, #star#,
+		#state#, #logoName#, #isSolo#, sysdate, #contentsGuide#, #contentsRefund#)
+	</insert>
+	
+	<!-- 유저 번호로 등록된 상품 번호 조회하기 -->
+	<select id="getSaleItemNo" parameterClass="int" resultClass="SaleItem">
+		select 
+				ITEM_NO 				as no,
+				USER_NO					as "user.no",
+				SUBCATE_NO				as subcategoryNo,
+				ITEM_TITLE				as title,
+				ITEM_CONTENTS			as content,
+				ITEM_PRICE				as price,
+				ITEM_LIKES				as likes,
+				ITEM_STAR				as star,
+				ITEM_STATE				as state,
+				ITEM_LOGO_IMG_NAME		as logoName,
+				ITEM_SOLO				as isSolo,
+				ITEM_UPLOAD_DATE		as uploadDate,
+				ITEM_CONTENTS_GUIDE		as contentsGuide,
+				ITEM_CONTENTS_REFUND    as contentsRefund
+		from(select
+				rownum 					as row1,
+				ITEM_NO 				,
+				USER_NO					,
+				SUBCATE_NO				,
+				ITEM_TITLE				,
+				ITEM_CONTENTS			,
+				ITEM_PRICE				,
+				ITEM_LIKES				,
+				ITEM_STAR				,
+				ITEM_STATE				,
+				ITEM_LOGO_IMG_NAME		,
+				ITEM_SOLO				,
+				ITEM_UPLOAD_DATE		,
+				ITEM_CONTENTS_GUIDE		,
+				ITEM_CONTENTS_REFUND   
+			from
+				(select *
+				 FROM
+				 	SALE_ITEM_TABLES
+				 ORDER BY
+				  	ITEM_UPLOAD_DATE desc)
+			where
+				USER_NO = #value#)
+			where
+				row1 &lt;= 1
+			
+	</select>
+	<!-- 회원번호에 맞는 찜한상품 보기 -->
+	<select id="getAllSteamItems" parameterClass="int" resultClass="SaleItem">
+		select
+
+			A.ITEM_NO					as no,
+			A.USER_NO					as "user.no",
+			A.SUBCATE_NO				as subcategoryNo,
+			A.ITEM_TITLE				as title,
+			A.ITEM_CONTENTS				as content,
+			A.ITEM_PRICE				as price,
+			A.ITEM_LIKES				as likes,
+			A.ITEM_STAR					as star,
+			A.ITEM_STATE				as state,
+			A.ITEM_LOGO_IMG_NAME		as logoName,
+			A.ITEM_SOLO					as isSolo,
+			A.ITEM_UPLOAD_DATE			as uploadDate,
+			A.ITEM_CONTENTS_GUIDE		as contentsGuide,
+			A.ITEM_CONTENTS_REFUND    	as contentsRefund
+
+		from
+			SALE_ITEM_TABLES A, STEAM_TABLES B
+		where
+		    B.user_no = #value#
+		and
+			A.item_no = B.item_no  
+
+	</select>
+	
+	
+	<!-- 상품의 추천순 등록순 조회하기 -->	
+	<select id="getSaleItemOrderByLike" parameterClass="map" resultClass="SaleItem">
+		select
+			A.ITEM_NO					as no,
+			A.SUBCATE_NO				as subcategoryNo,
+			A.ITEM_TITLE				as title,
+			A.ITEM_CONTENTS				as content,
+			A.ITEM_PRICE				as price,
+			A.ITEM_LIKES				as likes,
+			A.ITEM_STAR					as star,
+			A.ITEM_STATE				as state,
+			A.ITEM_LOGO_IMG_NAME		as logoName,
+			A.ITEM_SOLO					as isSolo,
+			A.ITEM_UPLOAD_DATE			as uploadDate,
+			A.ITEM_CONTENTS_GUIDE		as contentsGuide,
+			A.ITEM_CONTENTS_REFUND		as contentsRefund,
+			A.USER_NO					as "user.no"
+			,
+			(select  count(Y.ITEM_NO)
+              from STEAM_TABLES Y
+              where Y.ITEM_NO = A.ITEM_NO
+              and Y.USER_NO = #userNo#) as cnt
+		from
+			sale_item_tables A
+			<dynamic>
+				<isNotNull property="sub">
+				where	subcate_no = #sub#						
+				</isNotNull>
+				<isNull property="sub">
+					where subcate_no in (select subcate_no
+										from sub_category_table
+										where maincate_no = #main#)
+
+				</isNull>
+			</dynamic>
+			<dynamic>
+				<isEqual property="sort" compareValue="date">
+					order by item_upload_date desc
+				</isEqual>
+				<isEqual property="sort" compareValue="like">
+					order by item_likes desc
+				</isEqual>
+			</dynamic>
+			
+	</select>
+	
+		<!-- 상품번호로  아이템 한개 조회 -->
+   <select id="getSaleItemByNo" parameterClass="int" resultClass="SaleItem">
+      select 
+         ITEM_NO               as no,
+         SUBCATE_NO            as subcategoryNo,
+         ITEM_TITLE            as title,
+         ITEM_CONTENTS         as content,
+         ITEM_PRICE            as price,
+         ITEM_LIKES            as likes,
+         ITEM_STAR             as star,
+         ITEM_STATE            as state,
+         ITEM_LOGO_IMG_NAME    as logoName,
+         ITEM_SOLO             as isSolo,
+         ITEM_UPLOAD_DATE      as uploadDate,
+         ITEM_CONTENTS_GUIDE   as contentsGuide,
+         ITEM_CONTENTS_REFUND  as contentsRefund,
+         USER_NO               as "user.no"
+      from
+         sale_item_tables
+      where
+         item_no = #value#
+   </select>
+   
+   <!-- 유저번호로 등록한 상품 리스트 조회(등록 날짜순으로) -->
+   <select id="getSaleItemsDateByUserNo" parameterClass="int" resultClass="SaleItem">
+		select
+			A.ITEM_NO               	as no,
+         	A.SUBCATE_NO            	as subcategoryNo,
+          	A.ITEM_TITLE            	as title,
+          	A.ITEM_CONTENTS         	as content,
+          	A.ITEM_PRICE            	as price,
+          	A.ITEM_LIKES            	as likes,
+          	A.ITEM_STAR             	as star,
+          	A.ITEM_STATE            	as state,
+          	A.ITEM_LOGO_IMG_NAME    	as logoName,
+          	A.ITEM_SOLO             	as isSolo,
+          	A.ITEM_UPLOAD_DATE      	as uploadDate,
+          	A.ITEM_CONTENTS_GUIDE   	as contentsGuide,
+          	A.ITEM_CONTENTS_REFUND  	as contentsRefund,
+          	A.USER_NO               	as "user.no",
+			B.user_name 				as name,
+			B.user_email 				as email,
+			B.user_password 			as password,
+			B.user_phone 				as phoneNum,
+			B.user_nickname 			as nickName,
+			B.user_refund_bank_no 		as bank_no,
+			B.user_quiz_question 		as quizQuestion,
+			B.user_quiz_answer 			as quizAnswer,
+			B.user_create_date 			as createDate
+		from
+			sale_item_tables A, user_tables B
+		where
+			A.USER_NO = B.user_no
+		and
+			A.USER_NO = #value#
+		order by
+			A.ITEM_UPLOAD_DATE desc	
+   </select>
+   
+   <!-- 유저번호로 등록한 상품 리스트 조회(좋아요 갯수 순으로) -->
+   <select id="getSaleItemsLikeByUserNo" parameterClass="int" resultClass="SaleItem">
+		select
+			A.ITEM_NO               	as no,
+         	A.SUBCATE_NO            	as subcategoryNo,
+          	A.ITEM_TITLE            	as title,
+          	A.ITEM_CONTENTS         	as content,
+          	A.ITEM_PRICE            	as price,
+          	A.ITEM_LIKES            	as likes,
+          	A.ITEM_STAR             	as star,
+          	A.ITEM_STATE            	as state,
+          	A.ITEM_LOGO_IMG_NAME    	as logoName,
+          	A.ITEM_SOLO             	as isSolo,
+          	A.ITEM_UPLOAD_DATE      	as uploadDate,
+          	A.ITEM_CONTENTS_GUIDE   	as contentsGuide,
+          	A.ITEM_CONTENTS_REFUND  	as contentsRefund,
+          	A.USER_NO               	as "user.no",
+			B.user_name 				as name,
+			B.user_email 				as email,
+			B.user_password 			as password,
+			B.user_phone 				as phoneNum,
+			B.user_nickname 			as nickName,
+			B.user_refund_bank_no 		as bank_no,
+			B.user_quiz_question 		as quizQuestion,
+			B.user_quiz_answer 			as quizAnswer,
+			B.user_create_date 			as createDate
+		from
+			sale_item_tables A, user_tables B
+		where
+			A.USER_NO = B.user_no
+		and
+			A.USER_NO = #value#
+		order by
+			A.item_likes desc
+   </select>
+   
+   <!-- 심사대기중 상품 리스트 조회 -->
+   <select id="getSaleItemsState" resultClass="SaleItem">
+		select
+			A.ITEM_NO               	as no,
+         	A.SUBCATE_NO            	as subcategoryNo,
+          	A.ITEM_TITLE            	as title,
+          	A.ITEM_CONTENTS         	as content,
+          	A.ITEM_PRICE            	as price,
+          	A.ITEM_LIKES            	as likes,
+          	A.ITEM_STAR             	as star,
+          	A.ITEM_STATE            	as state,
+          	A.ITEM_LOGO_IMG_NAME    	as logoName,
+          	A.ITEM_SOLO             	as isSolo,
+          	A.ITEM_UPLOAD_DATE      	as uploadDate,
+          	A.ITEM_CONTENTS_GUIDE   	as contentsGuide,
+          	A.ITEM_CONTENTS_REFUND  	as contentsRefund,
+          	A.USER_NO               	as "user.no",
+			B.user_name 				as "user.name"
+		from
+			sale_item_tables A, user_tables B
+		where
+			A.USER_NO = B.user_no
+		order by
+			A.ITEM_UPLOAD_DATE desc
+   </select>
+   <!--검색물품 가져오기 -->
+   <select id="getItemBySearch" parameterClass="map" resultClass="SaleItem">
+   		select
+   			A.ITEM_NO               	as no,
+         	A.SUBCATE_NO            	as subcategoryNo,
+          	A.ITEM_TITLE            	as title,
+          	A.ITEM_CONTENTS         	as content,
+          	A.ITEM_PRICE            	as price,
+          	A.ITEM_LIKES            	as likes,
+          	A.ITEM_STAR             	as star,
+          	A.ITEM_STATE            	as state,
+          	A.ITEM_LOGO_IMG_NAME    	as logoName,
+          	A.ITEM_SOLO             	as isSolo,
+          	A.ITEM_UPLOAD_DATE      	as uploadDate,
+          	A.ITEM_CONTENTS_GUIDE   	as contentsGuide,
+          	A.ITEM_CONTENTS_REFUND  	as contentsRefund,
+          	A.USER_NO               	as "user.no",
+			B.user_name 				as "user.name",
+			B.user_nickname 			as "user.nickName",
+			(select  count(Y.ITEM_NO)
+              from STEAM_TABLES Y
+              where Y.ITEM_NO = A.ITEM_NO
+              and Y.USER_NO = #userNo#) as cnt
+		from
+			sale_item_tables A, user_tables B
+		where
+			A.USER_NO = B.user_no
+		and
+			A.item_title like '%' || #search# || '%'
+		order by
+			A.ITEM_UPLOAD_DATE desc
+   </select>
+   <!-- 상품 심사 결과 업데이트 -->
+   <update id="updateSaleitem" parameterClass="map">
+		update
+			sale_item_tables
+		set
+			ITEM_STATE = #saleState#
+		where
+			ITEM_NO = #saleNo#		
+   </update>
+		
+	<!-- 상품 삭제 하기 -->
+	<delete id="deleteSaleitem" parameterClass="int">
+		delete from
+			sale_item_tables
+		where
+			item_no = #productNo#
+	</delete>
+	
+
+</sqlMap>
+
+

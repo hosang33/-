@@ -1,0 +1,62 @@
+<%@page import="java.util.HashMap"%>
+<%@page import="java.util.Map"%>
+<%@page import="kr.pren.dao.OptionDao"%>
+<%@page import="kr.pren.dao.UserDao"%>
+<%@page import="kr.pren.dao.SaleItemDao"%>
+<%@page import="kr.pren.vo.SaleItem"%>
+<%@page import="kr.pren.vo.Order"%>
+<%@page import="kr.pren.dao.OrderDao"%>
+<%@page import="kr.pren.vo.User"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<%
+	User loginedUser = (User)session.getAttribute("LOGINED_USER");
+
+	request.setCharacterEncoding("utf-8");
+	
+	OrderDao orderDao = OrderDao.getInstance();
+	
+	int productNo = Integer.parseInt(request.getParameter("productNo"));
+	String itemName = request.getParameter("itemName");
+	String itemUserName = request.getParameter("itemUserName");
+	String sheet = request.getParameter("sheet");
+	String userBankNo = request.getParameter("userBankNo");
+	int sumtext = Integer.parseInt(request.getParameter("sumtext"));
+	SaleItemDao saleItemDao = SaleItemDao.getInstance();
+	SaleItem saleItem = saleItemDao.getSaleItemByNo(productNo);
+	
+	User user = new User();
+	user.setRefundBankNo(userBankNo);
+	user.setNo(loginedUser.getNo());
+	
+	UserDao userDao = UserDao.getInstance();
+	userDao.updateUserRefundBankNo(user);
+	
+	Order order = new Order();
+	order.setUserNo(loginedUser.getNo());
+	order.setItemNo(productNo);
+	order.setState("대기중");
+	order.setSheet(sheet);
+	order.setTotalPrice(sumtext);
+	order.setUser(user);
+	
+	orderDao.insertOrder(order);
+	
+	// 추가 옵션 테이블 추가  
+	Map<String,Object> map = new HashMap<>();
+	map.put("userNo", loginedUser.getNo());
+	map.put("productNo", productNo);
+	Order findOrder = orderDao.getNewOrderByMap(map);
+
+	OptionDao optionDao = OptionDao.getInstance();	
+	String optionNos[] = request.getParameterValues("optionNo");
+	for (int i =0; i<optionNos.length; i++) {
+		if (!optionNos[i].isEmpty() || optionNos[i]!=null) {
+			map.put("optionNo", optionNos[i]);
+			map.put("orderNo",findOrder.getNo() );
+			optionDao.insertOrderOption(map);
+		}
+	}
+	
+	response.sendRedirect("../buy_management/buy_management.jsp");
+%>

@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap      
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="notices">
+	<insert id="insertNotice" parameterClass="Notice">
+		insert into notice_tables(notice_no, notice_title, notice_contents)
+		values(NOTICE_TABLE_SEQ.nextval, #title#, #content#)
+	</insert>
+	
+	<select id="getNotices" resultClass="Notice">
+		select
+			notice_no 			as no,
+			notice_title 		as title,
+			notice_contents 	as content,
+			notice_create_date 	as "date",
+			notice_total_view	as totalView
+		from
+			notice_tables
+		order by
+			notice_no desc
+
+	</select>
+	<select id="getNoticeByNo" parameterClass="int" resultClass="Notice">
+		select
+			notice_no as no,
+			notice_title as title,
+			notice_contents as content,
+			notice_create_date as "date",
+			notice_total_view	as totalView
+		from
+			notice_tables
+		where
+			notice_no = #value#
+	</select>
+	<update id="updateTotalView" parameterClass="int">
+		update
+			notice_tables
+		set
+			notice_total_view = notice_total_view + 1
+		where
+			notice_no = #value#
+	</update>
+	
+	<delete id="deleteNotice" parameterClass="int">
+		delete from notice_tables
+		where notice_no = #value#
+	</delete>
+	
+	<update id="updateNotice" parameterClass="map">
+		update 
+			notice_tables
+		set
+			notice_title = #noticeTitle#,
+			notice_contents = #noticeContent#
+		where
+			notice_no = #value#
+	</update>
+	
+	<select id="countNotice" resultClass="int">
+		select
+			count(*)
+		from
+			notice_tables
+	</select>
+	
+	<select id="pageNotice" parameterClass="map" resultClass="Notice">
+		select
+			notice_no as no,
+			notice_title as title,
+			notice_contents as content,
+			notice_create_date as "date",
+			notice_total_view as totalView
+		from(select
+			ROW_NUMBER() over (order by notice_no desc) rn,
+			notice_no ,
+			notice_title ,
+			notice_contents ,
+			notice_create_date ,
+			notice_total_view
+		from
+			notice_tables)
+		where rn>=#begin# and rn &lt;=#end#
+	</select>
+	
+	<select id="selectSeeorDateNotice" parameterClass="map" resultClass="Notice">
+		select
+			notice_no as no,
+			notice_title as title,
+			notice_contents as content,
+			notice_create_date as "date",
+			notice_total_view as totalView
+		from (select
+				ROW_NUMBER() over (
+		<dynamic>
+			<isEqual property="sort" compareValue="date">
+			order by notice_no desc
+			</isEqual>
+			<isEqual property="sort" compareValue="like">
+			order by notice_total_view desc
+			</isEqual>
+		</dynamic> 
+				) rn,
+			notice_no,
+			notice_title,
+			notice_contents,
+			notice_create_date,
+			notice_total_view
+		from
+			notice_tables)
+		where rn>=#begin# and rn &lt;=#end#
+		
+	</select>
+	
+</sqlMap>

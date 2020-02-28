@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap      
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="subcategories">
+	<select id="getSubCategoryByMainNo" parameterClass="int" resultClass="SubCategory">
+		select
+			subcate_no			as no,
+			maincate_no			as mainCateNo,
+			subcate_name		as name
+		from
+			sub_category_table
+		where
+			maincate_no = #value#
+	</select>
+	
+	<select id="getAllSubCategories" resultClass="SubCategory">
+		select
+			subcate_no			as no,
+			maincate_no			as mainCateNo,
+			subcate_name		as name
+		from
+			sub_category_table
+		order by
+			subcate_no
+	</select>
+	
+	<select id="getSubCategoryByNo" parameterClass="int" resultClass="SubCategory">
+		select
+			subcate_no			as no,
+			maincate_no			as mainCateNo,
+			subcate_name		as name
+		from
+			sub_category_table
+		where
+			subcate_no = #value#
+	</select>
+</sqlMap>
+

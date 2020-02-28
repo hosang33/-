@@ -1,0 +1,254 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap      
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="users">
+	<insert id="insertUser" parameterClass="User">
+		insert into user_tables
+		(user_no, user_name, user_email, user_password, user_phone, user_nickname, user_quiz_question, user_quiz_answer, TOTAL_PROFIT, USER_SELLER_BANK_NO,USER_BANK_NAME, USER_REFUND_BANK_NAME)
+		values
+		(USER_TABLE_SEQ.nextval, #name#, #email#, #password#, #phoneNum#, #nickName#, #quizQuestion#, #quizAnswer#, #totalProfite#, #sellBankNo#, #bankName#,#refundBankName#)
+	</insert>
+	<select id="getUserById" parameterClass="string" resultClass="User">
+		select
+			user_no as no,
+			user_name as name,
+			user_email as email,
+			user_password as password,
+			user_phone as phoneNum,
+			USER_DELETE as isDelete,
+			user_nickname as nickName,
+			user_refund_bank_no as refundBankNo,
+			user_quiz_question as quizQuestion,
+			user_quiz_answer as quizAnswer,
+			user_create_date as createDate
+		from
+			user_tables
+		where
+			user_email = #value#
+	</select>
+	<select id="getUserManagement" resultClass="User">
+		select
+			user_no as no,
+			user_name as name,
+			user_email as email,
+			user_phone as phoneNum,
+			user_nickname as nickName,
+			user_delete as isDelete,
+			user_create_date as createDate
+		from
+			user_tables
+	</select>
+	
+	<select id="countManagement" parameterClass="map" resultClass="int">
+		select
+			count(*)
+		from
+			user_tables
+		where
+			<dynamic>
+				<isNull>
+					1=1
+				</isNull>
+				<isEqual property="sort" compareValue="name">
+					 user_name like '%' || #value# || '%'
+				</isEqual>
+				<isEqual property="sort" compareValue="email">
+					user_email like '%' || #value# || '%'
+				</isEqual>
+			</dynamic>
+	</select>
+	
+	<select id="getUserManagementpage" parameterClass="map" resultClass="User">
+		select
+			user_no as no,
+			user_name as name,
+			user_email as email,
+			user_phone as phoneNum,
+			user_nickname as nickName,
+			user_delete as isDelete,
+			user_create_date as createDate
+		from(
+			select
+				ROW_NUMBER() OVER(ORDER by user_no ASC) as rn,
+				user_no,
+				user_name,
+				user_email,
+				user_phone,
+				user_nickname,
+				user_delete,
+				user_create_date
+			from
+				user_tables
+			where
+				1=1
+			<dynamic>
+				<isEqual property="sort" compareValue="name">
+					and user_name like '%' || #value# || '%'
+				</isEqual>
+				<isEqual property="sort" compareValue="email">
+					and user_email like '%' || #value# || '%'
+				</isEqual>
+			</dynamic>	
+		)
+		where 
+			rn>=#begin# and rn &lt;=#end#
+	</select>
+
+	<select id="findUserById" parameterClass="User" resultClass="User">
+		select
+			user_email as email
+		from
+			user_tables
+		where
+			user_phone = #phoneNum#
+		and
+			user_name = #name#
+	</select>
+	
+	<select id="getUserByNo" parameterClass="int" resultClass="User">
+		select
+			user_no as no,
+			user_name as name,
+			user_email as email,
+			user_password as password,
+			user_phone as phoneNum,
+			user_nickname as nickName,
+			user_refund_bank_no as refundBankNo,
+			user_quiz_question as quizQuestion,
+			user_quiz_answer as quizAnswer,
+			user_create_date as createDate
+		from
+			user_tables
+		where
+			user_no = #value#
+	</select>
+	
+	<select id="findUserByPwd" parameterClass="User" resultClass="User">
+		select
+			user_password as password,
+			user_no		  as no
+		from
+			user_tables
+		where
+			user_email = #email#
+		and
+			user_quiz_question = #quizQuestion#
+		and
+			user_quiz_answer = #quizAnswer#
+	</select>
+	
+	<update id="updatepwd" parameterClass="map">
+		update
+			user_tables
+		set
+			user_password = #pwd#
+		where
+			user_no = #value#
+	</update>
+	
+	<update id="dropOutUser" parameterClass="map">
+		update
+			user_tables
+		set
+			user_delete_reason = #deleteReason#,
+			user_delete = 'y',
+			user_delete_select = #deleteSelect#
+		where
+			user_email = #userEmail#
+	</update>
+	<update id="updateUserNickname" parameterClass="map">
+		update
+			user_tables
+		set
+			user_nickname = #updatenickname#
+		where
+			user_no = #value#
+	</update>
+	
+
+	<update id="updateUserDayofTime" parameterClass="User">
+		update
+			user_tables
+		set
+			user_can_call_first_time = #callFirstTime#,
+			user_can_call_last_time = #callLastTime#
+		where
+			user_no = #no#
+	</update>
+	
+	<update id="updateUserDayofWeek" parameterClass="map">
+		update user_tables
+		set
+			USER_CAN_CALL_DATE = #callDate#
+		where
+			user_no = #userno#
+		
+	</update>
+	
+	<select id="getUserByWeekorTimeByNo" parameterClass="int" resultClass="User">
+		select
+			USER_NO as no,
+			USER_PROFILE_IMAGE_NAME as profileImgName,
+			nvl(USER_CAN_CALL_DATE,0) as callDate,
+			nvl(USER_CAN_CALL_FIRST_TIME,0) as callFirstTime,
+			nvl(USER_CAN_CALL_LAST_TIME,0) as callLastTime,
+			nvl(USER_BANK_NAME,0) as bankName,
+			nvl(USER_SELLER_BANK_NO,' ') as sellBankNo
+		from
+			user_tables
+		where
+			user_no = #value#
+	</select>
+	
+	<update id="updateUserPassword" parameterClass="map">
+		update user_tables
+		set
+			user_password = #userpassword#
+		where
+			user_no = #userno#
+	</update>
+	
+	<update id="updateUserProfit" parameterClass="Order">
+		update user_tables
+		set
+			total_profit = #totalPrice#
+		where
+			user_no = #userNo#
+	</update>
+	
+	<update id="updateUserBank" parameterClass="map">
+		update user_tables
+		set
+			USER_BANK_NAME = #bankName#,
+			USER_SELLER_BANK_NO = #sellBankNo#
+		where
+			user_no = #userno#
+	</update>
+	
+	<update id="updateUserRefundBankNo" parameterClass="User">
+		update user_tables
+		set
+			USER_REFUND_BANK_NO = #refundBankNo#
+		where
+			user_no = #no#
+	</update>
+	<update id="updateUserImg" parameterClass="User">
+		update user_tables
+		set
+			USER_PROFILE_IMAGE_NAME = #profileImgName#
+		where
+			user_no = #no#
+	</update>
+	
+	<update id="stopUser" parameterClass="int">
+		update user_tables
+		set
+			USER_DELETE = 'y'
+		where
+			user_no = #value#
+	</update>
+
+</sqlMap>

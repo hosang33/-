@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap      
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="steams">
+
+<!-- 찜목록 전체 조회하기 -->
+<select id="getSteamList" resultClass="Steam">
+select
+	STEAM_NO	as no,
+	USER_NO		as userNo,
+	ITEM_NO		as itemNo,
+	STEAM_DATE	as createDate
+from
+	steam_tables
+</select>
+
+
+<!-- 찜한 상품 추가하기 -->
+<insert id="insertSteam" parameterClass="Steam">
+insert into steam_tables
+(STEAM_NO, USER_NO, ITEM_NO, STEAM_DATE)
+values
+(STEAM_TABLE_SEQ.nextval, #userNo#, #itemNo#, sysdate)
+</insert>
+
+<!-- 상품번호에 해당하는 유저수 조회 -->
+<select id="getSteamCountByItemNo" parameterClass="int" resultClass="int">
+select
+	count(item_no)
+from
+	steam_tables
+where
+	item_no = #value#
+</select>
+
+<!-- 유저번호에 해당하는 상품 삭제하기 -->
+<delete id="deleteSteam" parameterClass="Steam">
+	delete from 
+		steam_tables
+	where
+		user_no = #userNo#
+	and
+		item_no = #itemNo#
+</delete>
+
+<!-- 유저번호와 steam안에 상품번호로 조회 -->
+<select id="getSteamByuserNoAndItemNo" parameterClass="Steam" resultClass="int">
+select
+	count(item_no)
+from
+	steam_tables
+where
+	user_no = #userNo#
+and
+	item_no = #itemNo#
+</select>
+
+
+
+</sqlMap>

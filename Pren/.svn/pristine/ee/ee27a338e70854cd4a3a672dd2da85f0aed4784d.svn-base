@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap      
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="itemimages">
+
+	<!-- 서브 이미지 등록 -->
+	<insert id="insertSubItemImage" parameterClass="ItemImage">
+		insert into ITEM_IMAGE_TABLES
+		(ITEM_IMAGE_TABLES_NO, ITEM_NO, USER_NO, ITEM_IMAGE_NAME)
+		values
+		(ITEM_IMAGE_TABLE_SEQ.nextval, #itemNo#, #userNo#, #Name#)
+	</insert>
+	
+	<!-- 서브 이미지 번호로 조회하기 -->
+	<select id="getItemImageByNo" parameterClass="Int" resultClass="ItemImage">
+		select
+			ITEM_IMAGE_TABLES_NO			as no,
+			ITEM_NO							as itemNo,
+			USER_NO							as userNo,
+			ITEM_IMAGE_NAME					as name
+		from
+			ITEM_IMAGE_TABLES
+		where
+			item_no = #value#
+			
+	</select>
+	
+	<!-- 서브이미지 추가 한거 출력 기능(회원번호에 맞는 이미지) -->
+	<select id="getItemImageSearchByUserNo" parameterClass="int" resultClass="ItemImage">
+		select
+			ITEM_IMAGE_TABLES_NO			as no,
+			ITEM_NO							as itemNo,
+			USER_NO							as userNo,
+			ITEM_IMAGE_NAME					as name
+		from
+			ITEM_IMAGE_TABLES
+		where
+			USER_NO = #value#
+	</select>
+	
+	
+</sqlMap>

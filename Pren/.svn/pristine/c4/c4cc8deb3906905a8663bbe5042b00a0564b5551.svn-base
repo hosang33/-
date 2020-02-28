@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMapConfig      
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map Config 2.0//EN"      
+    "http://ibatis.apache.org/dtd/sql-map-config-2.dtd">
+
+<sqlMapConfig>
+<settings useStatementNamespaces="true"/> <!--id충돌회피-->
+	<typeAlias alias="ItemImage" type="kr.pren.vo.ItemImage"/>
+	<typeAlias alias="Message" type="kr.pren.vo.Message"/>
+	<typeAlias alias="Notice" type="kr.pren.vo.Notice"/>
+	<typeAlias alias="Option" type="kr.pren.vo.Option"/>
+	<typeAlias alias="Order" type="kr.pren.vo.Order"/>
+	<typeAlias alias="Review" type="kr.pren.vo.Review"/>
+	<typeAlias alias="SaleItem" type="kr.pren.vo.SaleItem"/>
+	<typeAlias alias="Steam" type="kr.pren.vo.Steam"/>
+	<typeAlias alias="SubCategory" type="kr.pren.vo.SubCategory"/>
+	<typeAlias alias="User" type="kr.pren.vo.User"/>
+	<typeAlias alias="Main" type="kr.pren.vo.MainCategory"/>
+	
+
+	<transactionManager type="JDBC" commitRequired="false">
+		<dataSource type="SIMPLE">
+			<property name="JDBC.Driver" value="oracle.jdbc.OracleDriver" />
+			<property name="JDBC.ConnectionURL" value="jdbc:oracle:thin:@192.168.10.63:1521:xe" />
+			<property name="JDBC.Username" value="money3333" />
+			<property name="JDBC.Password" value="zxcv1234" />
+		</dataSource>
+	</transactionManager>
+
+	<sqlMap resource="kr/pren/ibatis/ItemImages.xml" />
+	<sqlMap resource="kr/pren/ibatis/Messages.xml" />
+	<sqlMap resource="kr/pren/ibatis/Notices.xml" />
+	<sqlMap resource="kr/pren/ibatis/Options.xml" />
+	<sqlMap resource="kr/pren/ibatis/Orders.xml" />
+	<sqlMap resource="kr/pren/ibatis/Reviews.xml" />
+	<sqlMap resource="kr/pren/ibatis/SaleItems.xml" />
+	<sqlMap resource="kr/pren/ibatis/Steams.xml" />
+	<sqlMap resource="kr/pren/ibatis/SubCategorys.xml" />
+	<sqlMap resource="kr/pren/ibatis/Users.xml" />
+	<sqlMap resource="kr/pren/ibatis/MainCategory.xml" />
+		
+</sqlMapConfig>

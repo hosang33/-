@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap      
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="Messages">
+	<select id="getAllMessage" parameterClass="map" resultClass="Message">
+		select 
+			msg_no 			as no,
+			send_user_no 	as sendUserNo,
+			receive_user_no as ReceiveUserNo,
+			msg_contents    as content,
+			msg_star 		as star,
+			msg_read		as isRead,
+			msg_sell_state  as sellState,
+			msg_send_date   as sendDate
+		from 
+			 (select 
+			 		ROW_NUMBER() OVER(ORDER by msg_send_date DESC)  numrow,
+			 		msg_no, 			
+					send_user_no, 		
+					receive_user_no, 
+					msg_contents,    
+					msg_star,		
+					msg_read,	
+					msg_sell_state,  
+					msg_send_date 
+			  from 
+			  		message_tables
+			  where
+			  <dynamic>	  
+			  	<isNotNull property="userNo">
+			  		receive_user_no = #userNo#
+			  	</isNotNull>
+			  	<isNotNull property="sendUserNo">
+			  		send_user_no = #sendUserNo#
+			  	</isNotNull>
+			  </dynamic> 
+				<dynamic prepend="and">
+					<isEqual property="state" compareValue="거래중">
+						msg_sell_state = '거래중' 
+					</isEqual>
+					<isEqual property="state" compareValue="안읽음">
+						msg_read = 'n'
+					</isEqual>
+					<isEqual property="state" compareValue="메세지찜">
+						msg_star = 'y'
+					</isEqual>
+				</dynamic>
+			  )
+		where
+			numrow >= #begin#
+		and
+			numrow &lt;= #end#
+	
+	</select>
+	
+	<select id="getMessageByNo" parameterClass="int" resultClass="Message">
+		select
+			MSG_NO 				as no,
+			SEND_USER_NO		as sendUserNo,
+			RECEIVE_USER_NO		as ReceiveUserNo,
+			MSG_CONTENTS		as content,
+			MSG_STAR			as star,
+			MSG_READ			as isRead,
+			MSG_SELL_STATE		as sellState,
+			MSG_SEND_DATE		as sendDate
+		from
+			message_tables
+		where
+			msg_no = #value#
+	
+	</select>
+
+	<select id="getMessageCount" parameterClass="int" resultClass="int">
+		select
+			count(*)
+		from
+			message_tables
+		where
+			receive_user_no =#value#
+	</select>
+	
+	<insert id="insertMessage" parameterClass="Message">
+		insert into message_tables(
+			MSG_NO,
+			SEND_USER_NO,
+			RECEIVE_USER_NO,
+			MSG_CONTENTS,
+			MSG_STAR,
+			MSG_READ,
+			MSG_SELL_STATE,
+			MSG_SEND_DATE)
+		values(message_table_seq.nextval,#sendUserNo#,#ReceiveUserNo#,#content#,#star#,#isRead#,#sellState#,sysdate)
+			
+	</insert>
+	
+	<update id="updateMessageStateByNo" parameterClass="int">
+		update 
+			MESSAGE_TABLES
+		set
+			MSG_READ = 'y'
+		where
+			msg_no = #value#
+	</update>
+</sqlMap>

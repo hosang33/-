@@ -1,0 +1,97 @@
+<%@page import="kr.pren.vo.User"%>
+<%@page import="kr.pren.dao.SubCategoryDao"%>
+<%@page import="kr.pren.vo.SubCategory"%>
+<%@page import="java.util.List"%>
+<%@page import="kr.pren.vo.MainCategory"%>
+<%@page import="kr.pren.dao.MainCategoryDao"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
+
+
+<div class="navbar navbar-default">
+	<div class="container">
+		<div class="navbar-header">
+			<a href="../main/index.jsp" class="navbar-brand"><img
+				src="../../resources/images/default/logo.png"
+				style="width: 120px; height: 30px;"></a>
+		</div>
+		<div class="header-search col-sm-3" style="margin: 0px 0px 0px -15px; padding: 15px">
+			<form action="search.jsp" method="post">
+				<span class="ant-input-search ant-input-search-enter-button ant-input-group-wrapper" style="width: 180px;">
+					<span class="ant-input-wrapper ant-input-group">
+						<input placeholder="상품명 입력" name="search" class="ant-input" type="text" />
+						<span class="ant-input-group-addon">
+							<button type="submit" class="ant-btn ant-input-search-button ant-btn-primary">
+								<span class="glyphicon glyphicon-search"></span>
+							</button>
+						</span>
+					</span>
+				</span>
+			</form>
+		<%
+			request.setCharacterEncoding("UTF-8");
+			User loginedUser = (User)session.getAttribute("LOGINED_USER");
+		%>
+		</div>
+		<ul class="nav navbar-nav navbar-right">
+		<%
+			if(loginedUser != null){
+		%>
+			<li><a href="../myfren/my_buy.jsp">마이프렌</a></li>
+			<li><a href="../message/message_all.jsp?pageno=1">메세지</a></li>
+			<li><a href="../buy_management/buy_management.jsp">구매</a></li>
+			<li><a href="../mypage/my_info_form.jsp"><%=loginedUser.getNickName() %></a></li>
+			<li><a href="../mypage/logout.jsp">로그아웃</a></li>
+		<%
+			}
+		%>
+		</ul>
+		<% 
+			if(loginedUser == null){
+				
+				
+				String path = request.getRequestURI();
+				String queryString = request.getQueryString();
+		%>
+		<ul class="nav navbar-nav navbar-right">
+			<li><a href="../mypage/login_form.jsp?path=<%=path%>?<%=queryString%>">로그인</a></li>
+			<li><a href="../mypage/register_form.jsp">회원가입</a></li>
+		</ul>
+		<%
+			}
+		%>
+	</div>
+	<div class="container">
+		<div class="nav navbar-nav navbar-left">
+			<ul class="nav navbar-nav" style="font-weight: bold; font-size: large; ">
+			<%
+				
+				MainCategoryDao mainDao = MainCategoryDao.getInstance();
+				SubCategoryDao subDao = SubCategoryDao.getInstance();
+				List<MainCategory> mainList = mainDao.getMainCategory();
+				
+				for (MainCategory m : mainList) {
+			
+					List<SubCategory> subList =  subDao.getSubCategoryByMainNo(m.getNo());
+				
+			%>
+				<li class="dropdown"><a href="../main/category_display.jsp?maincategory=<%=m.getNo() %>" ><%=m.getName() %></a>
+					<ul class="dropdown-menu">
+				<%
+					for (SubCategory s : subList) { 
+				%>
+						<li><a href="../main/category_display.jsp?maincategory=<%=m.getNo() %>&subcategory=<%=s.getNo() %>"><%=s.getName() %></a></li>
+
+				<%
+					}
+				%>
+				
+					</ul>
+				<%
+					}
+				%>
+				</li>
+			</ul>
+		</div>
+	</div>
+</div>

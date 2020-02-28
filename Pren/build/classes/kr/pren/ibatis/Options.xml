@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap      
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="options">
+	<!-- 추가 옵션 등록 -->
+	<insert id="insertOption" parameterClass="Option">
+		insert into OPTION_TABLES
+		(OPTION_NO, ITEM_NO, OPTION_TITLE, OPTION_PRICE, OPTION_ISPLUS)
+		values
+		(option_table_seq.nextval, #itemNo#, #title#, #price#, #plus#)
+	</insert>
+	
+	<insert id="insertOrderOption" parameterClass="map">
+		insert into ORDER_OPTION_TABLES 
+			(NO,OPTION_NO,ORDER_NO)
+		values
+		(order_option_tables_seq.nextval,#optionNo#,#orderNo#)	
+	</insert>
+	<select id="getOptionByNo" parameterClass="int" resultClass="Option">
+		select
+			OPTION_NO			as no,
+			ITEM_NO				as itemNo,
+			OPTION_TITLE		as title,
+			OPTION_PRICE		as price,
+			OPTION_ISPLUS 		as plus
+		from
+			option_tables
+		where
+			item_no = #value#
+	</select>
+	
+	<select id="getAllOptionByOrderNo" parameterClass="int" resultClass="Option">
+		select
+			A.OPTION_NO				as no,
+			A.ITEM_NO				as itemNo,
+			A.OPTION_TITLE			as title,
+			A.OPTION_PRICE			as price,
+			A.OPTION_ISPLUS 		as plus
+		from
+			option_tables A, order_option_tables B
+		where
+			A.option_no = B.option_no
+		and
+			B.order_no = #value#
+	</select>
+	
+	<delete id="deleteAllOrderOptionByOptionNo" parameterClass="int">
+		delete from order_option_tables
+		where order_no = #value#
+	</delete>
+	
+	<delete id="deleteAllOptionByItemNo" parameterClass="int">
+		delete from option_tables
+		where item_no = #value#
+	</delete>
+</sqlMap>
