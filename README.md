@@ -1,21 +1,21 @@
 # 재능 마켓 사이트 
 
-### 1 . 메인화면
+### 0. 사용언어 및 환경 
+![환경](https://user-images.githubusercontent.com/57142305/75865493-fdfa9180-5e46-11ea-9195-d5626d15b65c.png)
 
-![메인](https://user-images.githubusercontent.com/57142305/75537903-20f9ff80-5a5b-11ea-8b96-170b112e302f.jpg)
-
-
-### 2 . 웹 구조 
+### 1 . 웹 구조 
 <div>
   <img width="1000" src="https://user-images.githubusercontent.com/57142305/75539679-ffe6de00-5a5d-11ea-88f5-61ff162103d1.png"></img>
 </div>
 
-
-### 3 . ERD
+### 2 . ERD
 <div>
   <img width="700" src="https://user-images.githubusercontent.com/57142305/75538386-da58d500-5a5b-11ea-9999-c26c8daeb78b.png"></img>
 </div>
 
+### 3 . 메인화면
+
+![메인](https://user-images.githubusercontent.com/57142305/75537903-20f9ff80-5a5b-11ea-8b96-170b112e302f.jpg)
 
 ### 4 . 찜 목록
 <div>
